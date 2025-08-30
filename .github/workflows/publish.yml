@@ -1,0 +1,62 @@
+name: Publish assets to R2
+on:
+  push:
+    tags:
+      - 'docs-*'      # e.g., docs-lucidseal-principles-1.0.0
+      - 'guides-*'    # e.g., guides-board-briefing-kit-0.2.0
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      R2_BUCKET: lucidseal-assets
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y awscli jq
+
+      - name: Parse tag into category/slug/version
+        id: meta
+        shell: bash
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          IFS='-' read -r CATEGORY SLUG VERSION <<< "$TAG"
+          echo "category=$CATEGORY" >> $GITHUB_OUTPUT
+          echo "slug=$SLUG" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Tag parsed: $CATEGORY / $SLUG / $VERSION"
+
+      - name: Configure AWS (Cloudflare R2)
+        run: |
+          aws configure set aws_access_key_id "${{ env.R2_ACCESS_KEY_ID }}"
+          aws configure set aws_secret_access_key "${{ env.R2_SECRET_ACCESS_KEY }}"
+          aws configure set default.region "auto"
+
+      - name: Upload versioned PDFs
+        run: |
+          ENDPOINT="https://${{ env.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com"
+          SRC="dist/${{ steps.meta.outputs.slug }}/${{ steps.meta.outputs.version }}/"
+          DEST="s3://${{ env.R2_BUCKET }}/${{ steps.meta.outputs.category }}/${{ steps.meta.outputs.slug }}/${{ steps.meta.outputs.version }}/"
+          if [ -d "$SRC" ]; then
+            aws s3 cp "$SRC" "$DEST" --recursive --endpoint-url "$ENDPOINT" --cache-control "public, max-age=31536000, immutable" --content-type "application/pdf"
+          else
+            echo "No files to upload at $SRC"; exit 1
+          fi
+
+      - name: Update 'latest' alias
+        run: |
+          ENDPOINT="https://${{ env.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com"
+          SRC="dist/${{ steps.meta.outputs.slug }}/${{ steps.meta.outputs.version }}/"
+          DEST="s3://${{ env.R2_BUCKET }}/${{ steps.meta.outputs.category }}/${{ steps.meta.outputs.slug }}/latest/"
+          aws s3 rm "$DEST" --recursive --endpoint-url "$ENDPOINT" || true
+          aws s3 cp "$SRC" "$DEST" --recursive --endpoint-url "$ENDPOINT" --cache-control "public, max-age=300" --content-type "application/pdf"
+
+      - name: Publish manifest
+        run: |
+          ENDPOINT="https://${{ env.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com"
+          aws s3 cp "manifest/index.json" "s3://${{ env.R2_BUCKET }}/manifest/index.json" --endpoint-url "$ENDPOINT" --cache-control "public, max-age=300" --content-type "application/json"
