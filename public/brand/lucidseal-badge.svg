@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1">
+      <stop offset="0" stop-color="#60a5fa"/><stop offset="1" stop-color="#22c55e"/>
+    </linearGradient>
+  </defs>
+  <circle cx="100" cy="100" r="92" fill="url(#g)" opacity=".2"/>
+  <circle cx="100" cy="100" r="86" fill="none" stroke="url(#g)" stroke-width="8"/>
+  <path d="M65 106l23 23 47-57" fill="none" stroke="url(#g)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="100" y="155" font-family="Poppins, sans-serif" font-size="18" text-anchor="middle" fill="#222">LucidSeal</text>
+</svg>

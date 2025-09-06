@@ -1,0 +1,11 @@
+name = "lucidseal-assets-worker"
+main = "src/worker.js"
+compatibility_date = "2025-09-01"
+
+routes = [
+  { pattern = "assets.lucidseal.org/*", zone_name = "lucidseal.org" }
+]
+
+r2_buckets = [
+  { binding = "ASSETS_BUCKET", bucket_name = "lucidseal-assets" }
+]
