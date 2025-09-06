@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <symbol id="lucidseal-badge-dark" viewBox="0 0 64 64">
+    <path d="M32 2 L58 12 V30 C58 44 47 56 32 62 C17 56 6 44 6 30 V12 Z"
+          fill="none" stroke="#1d2d44" stroke-width="3"/>
+    <path d="M20 33 L28 41 L44 23"
+          fill="none" stroke="#1d2d44" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+  <symbol id="lucidseal-badge-light" viewBox="0 0 64 64">
+    <rect width="64" height="64" fill="none"/>
+    <path d="M32 2 L58 12 V30 C58 44 47 56 32 62 C17 56 6 44 6 30 V12 Z"
+          fill="none" stroke="#ffffff" stroke-width="3"/>
+    <path d="M20 33 L28 41 L44 23"
+          fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+</svg>
