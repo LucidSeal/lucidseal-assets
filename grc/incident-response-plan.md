@@ -1,4 +1,4 @@
-**# Incident Response Plan (Lite)
+** # Incident Response Plan (Lite)
 
 
 Step 1: Detect  
@@ -20,4 +20,4 @@ Test and verify before resuming service.
 Step 5: Learn  
 Update the Risk Register and controls.  
 Share a plain-language summary on the Trust Page if relevant.
-**
+** 
