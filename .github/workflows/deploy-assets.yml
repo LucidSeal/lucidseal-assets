@@ -56,12 +56,9 @@ jobs:
             updated=$(date -u -r "$f" +%FT%TZ)
             base=$(basename "$f")
             title="${base%.*}"
-            title="$(printf '%s' "$title" | tr '-' ' ' | python3 - <<'PY'
-import sys
-t=sys.stdin.read().strip()
-print(" ".join(w[:1].upper()+w[1:] for w in t.split()))
-PY
-)"
+            # dashes -> spaces, Capitalize Words (Python one-liner to avoid heredoc/indent issues)
+            title="$(printf '%s' "$title" | tr '-' ' ' | python3 -c 'import sys;t=sys.stdin.read().strip();print(" ".join(w[:1].upper()+w[1:] for w in t.split()))')"
+
             category="$(dirname "$key" | cut -d/ -f1)"
             [ "$category" = "." ] && category="root"
 
