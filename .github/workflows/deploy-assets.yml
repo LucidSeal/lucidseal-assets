@@ -22,8 +22,11 @@ jobs:
       - name: Verify public directory
         run: test -d public || { echo "No public/ directory found"; exit 1; }
 
-      - name: Install rclone
-        uses: gacts/install-rclone@v1
+        - name: Install rclone (official)
+        run: |
+          curl -fsSL https://rclone.org/install.sh | sudo -E bash
+          rclone version
+    
 
       - name: Configure rclone for R2
         shell: bash
