@@ -1,0 +1,2 @@
+public/**
+# Extras can be listed below (none needed for MVP)

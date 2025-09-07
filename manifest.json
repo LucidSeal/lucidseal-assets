@@ -1,0 +1,77 @@
+{
+  "generated_at": "2025-09-06T19:48:47Z",
+  "items": [
+    {
+      "path": "brand/brand-guide.pdf",
+      "title": "Brand Guide",
+      "category": "brand",
+      "mime": "application/pdf",
+      "size": 16280,
+      "updated_at": "2025-09-06T19:48:49Z"
+    },
+    {
+      "path": "brand/lucidseal-badge.png",
+      "title": "Lucidseal Badge",
+      "category": "brand",
+      "mime": "image/png",
+      "size": 11863,
+      "updated_at": "2025-09-06T19:48:48Z"
+    },
+    {
+      "path": "brand/lucidseal-badge.svg",
+      "title": "Lucidseal Badge",
+      "category": "brand",
+      "mime": "image/svg+xml",
+      "size": 637,
+      "updated_at": "2025-09-06T19:48:48Z"
+    },
+    {
+      "path": "community/escalation-pathway.pdf",
+      "title": "Escalation Pathway",
+      "category": "community",
+      "mime": "application/pdf",
+      "size": 15855,
+      "updated_at": "2025-09-06T19:48:48Z"
+    },
+    {
+      "path": "cross-principle/baseline-maturity-checklist.xlsx",
+      "title": "Baseline Maturity Checklist",
+      "category": "cross-principle",
+      "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "size": 5606,
+      "updated_at": "2025-09-06T19:48:48Z"
+    },
+    {
+      "path": "cross-principle/trust-page-template.pdf",
+      "title": "Trust Page Template",
+      "category": "cross-principle",
+      "mime": "application/pdf",
+      "size": 14578,
+      "updated_at": "2025-09-06T19:48:48Z"
+    },
+    {
+      "path": "privacy/privacy-notice-template.pdf",
+      "title": "Privacy Notice Template",
+      "category": "privacy",
+      "mime": "application/pdf",
+      "size": 16895,
+      "updated_at": "2025-09-06T19:48:48Z"
+    },
+    {
+      "path": "security/risk-register-starter.xlsx",
+      "title": "Risk Register Starter",
+      "category": "security",
+      "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "size": 5776,
+      "updated_at": "2025-09-06T19:48:48Z"
+    },
+    {
+      "path": "transparency/plain-language-glossary.md",
+      "title": "Plain Language Glossary",
+      "category": "transparency",
+      "mime": "text/markdown; charset=utf-8",
+      "size": 426,
+      "updated_at": "2025-09-06T19:48:48Z"
+    }
+  ]
+}

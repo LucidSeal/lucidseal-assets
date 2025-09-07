@@ -1,31 +1,129 @@
-# LucidSeal Assets (Docs & Guides)
+# LucidSeal Assets (MVP)
 
-This repository is the **source of truth** for LucidSeal documents (principles, guides, kits).  
-Editable files live in `src/` (tracked with Git LFS). Distribution-ready **PDFs** are exported to `dist/` and **published to Cloudflare R2** via GitHub Actions.
+[![Build Status](https://github.com/lucidseal/lucidseal-assets/actions/workflows/deploy-assets.yml/badge.svg)](https://github.com/lucidseal/lucidseal-assets/actions/workflows/deploy-assets.yml)
+![Last Updated](https://img.shields.io/github/last-commit/lucidseal/lucidseal-assets/main?label=Last%20Updated)
+[![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
 
-## Workflow
-1. Edit Word/PowerPoint in `src/...`
-2. Export PDF to `dist/<category>/<slug>/<version>/<file>.pdf`
-3. Update `manifest/index.json` (current version + URLs)
-4. Commit → Tag (`docs-<slug>-<version>` or `guides-<slug>-<version>`)
-5. CI publishes to R2 at `assets.lucidseal.org`
+This repository is the **source of truth** for LucidSeal’s public assets and internal governance (GRC) documents.
 
-## Versioned & Stable URLs
-- Versioned (immutable): `https://assets.lucidseal.org/docs/<slug>/<version>/<file>.pdf`
-- Stable alias:          `https://assets.lucidseal.org/docs/<slug>/latest/<file>.pdf`
+- **Public assets** → Published automatically to [https://assets.lucidseal.org](https://assets.lucidseal.org)  
+- **Internal GRC docs** → Versioned in GitHub for governance, but **not published**  
 
-## Repo layout
-src/                 # Editable docs (LFS)
-dist/                # Exported PDFs (built artifacts)
-manifest/index.json  # Machine-readable index (current & all versions)
-.github/workflows/   # CI to publish to R2
+---
 
-## Secrets (in GitHub)
-- R2_ACCOUNT_ID
-- R2_ACCESS_KEY_ID
-- R2_SECRET_ACCESS_KEY
+## 📂 Structure
 
-## Local notes
-- Use consistent slugs (e.g., `lucidseal-principles`, `board-briefing-kit`)
-- PDFs should be optimized for web (150–200dpi is usually enough).
-- Large binary files (`.docx/.pptx`) are tracked with Git LFS.
+```
+
+public/              → Assets published to assets.lucidseal.org
+privacy/           → Privacy by Default (templates, notices)
+transparency/      → Transparency in Action (glossary, guides)
+security/          → Secure Foundations (checklists, registers)
+community/         → Community First (escalation docs, surveys)
+cross-principle/   → Combined assets (Trust Page, maturity checklist)
+brand/             → Badge, logos, brand guide
+templates/           → Drafts or working copies (not published)
+src/worker.js        → Cloudflare Worker serving assets
+.github/workflows/   → CI pipeline for publishing
+wrangler.toml        → Worker configuration
+publish-allowlist.txt→ Optional: include extra files outside public/
+
+```
+
+---
+
+## 🚀 Workflow
+
+1. **Add or update a file** under `public/`
+2. **Commit & push to `main`**
+3. **GitHub Action runs**:
+   - Uploads all files under `public/` to the R2 bucket
+   - Generates/updates `manifest.json`
+4. Assets are live at:  
+```
+
+[https://assets.lucidseal.org/](https://assets.lucidseal.org/)<category>/<filename>
+
+```
+
+---
+
+## 📜 Manifest
+
+A machine-readable index of all public assets is served at:
+
+```
+
+[https://assets.lucidseal.org/manifest.json](https://assets.lucidseal.org/manifest.json)
+
+```
+
+Each entry includes:  
+`path`, `title`, `category`, `mime`, `size`, `updated_at`.
+
+---
+
+## 🔐 Internal GRC
+
+- Located under `/grc/`  
+- Includes: Privacy Policy, Terms of Use, IR Plan, Access & Identity Policy, BC/DR Lite  
+- **Never published** (excluded from CI/CD)  
+
+---
+
+## 🛡️ Security & Headers
+
+The Cloudflare Worker ensures:
+- Correct MIME type for each file  
+- `Content-Disposition`: inline for PDFs/images, attachment for Office docs  
+- Cache: 10m browser / 1d edge (manifest fresher: 1m/10m)  
+- Security headers: `nosniff`, `no-referrer`, limited CORS (lucidseal.org only)  
+
+---
+
+## 🔧 Setup (for maintainers)
+
+- **Cloudflare R2**: bucket `lucidseal-assets`  
+- **Cloudflare Worker**: `src/worker.js`, deploy with `wrangler deploy`  
+- **Route**: `assets.lucidseal.org/*` → Worker  
+- **GitHub Secrets**:
+  - `CLOUDFLARE_ACCOUNT_ID`
+  - `R2_ACCESS_KEY_ID`
+  - `R2_SECRET_ACCESS_KEY`
+  - `R2_BUCKET` = `lucidseal-assets`
+
+---
+
+## ✅ Example Assets
+
+- Privacy Notice:  
+  [privacy/privacy-notice-template.pdf](https://assets.lucidseal.org/privacy/privacy-notice-template.pdf)
+- Risk Register Starter:  
+  [security/risk-register-starter.xlsx](https://assets.lucidseal.org/security/risk-register-starter.xlsx)
+- Trust Page (One-Pager):  
+  [cross-principle/trust-page-template.pdf](https://assets.lucidseal.org/cross-principle/trust-page-template.pdf)
+
+---
+
+## 🔮 Future Enhancements
+
+- Versioned URLs (`/v1/...`) and immutable hash paths (`/sha256/...`)  
+- Auto-generate DOCX/PDF from Markdown templates (Pandoc in CI)  
+- Optional public UI for browsing assets  
+- Signed URLs for restricted or draft assets  
+
+---
+
+## 📖 License
+
+All public assets in this repository are licensed under the  
+[Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/).
+
+You are free to:  
+✔️ Share — copy and redistribute in any medium or format  
+✔️ Adapt — remix, transform, and build upon the material  
+for any purpose, even commercially.  
+
+You must:  
+✏️ Give appropriate credit and indicate if changes were made.
+```
