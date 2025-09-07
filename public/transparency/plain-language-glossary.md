@@ -1,4 +1,4 @@
-# Plain-Language Glossary (Starter)
+# Plain-Language Glossary (Starter-/sample only)
 
 - **Data minimisation** — Collect only what you truly need.
 - **Encryption** — Scrambling data so only authorised people can read it.
