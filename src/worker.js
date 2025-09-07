@@ -63,7 +63,9 @@ export default {
     }
 
     const url = new URL(request.url);
-    let key = url.pathname.replace(/^\\/+/, "");
+    let key = url.pathname.replace(/^\/+/, "");
+//            ^^^^^  single slash escaped inside a JS regex literal
+
 
     // Health & root
     if (url.pathname === "/health") {

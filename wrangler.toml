@@ -6,6 +6,6 @@ routes = [
   { pattern = "assets.lucidseal.org/*", zone_name = "lucidseal.org" }
 ]
 
-[[r2_buckets]]
-binding = "ASSETS_BUCKET"
-bucket_name = "lucidseal-assets"
+r2_buckets = [
+  { binding = "ASSETS_BUCKET", bucket_name = "lucidseal-assets" }
+]
