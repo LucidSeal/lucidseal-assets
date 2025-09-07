@@ -2,7 +2,8 @@ name: Deploy assets to R2 (public-only)
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
     paths:
       - "public/**"
 
@@ -20,16 +21,16 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Verify public directory
-        run: test -d public || { echo "No public/ directory found"; exit 1; }
+        run: |
+          set -euxo pipefail
+          test -d public
 
-        - name: Install rclone (official)
+      - name: Install rclone (official)
         run: |
           curl -fsSL https://rclone.org/install.sh | sudo -E bash
           rclone version
-    
 
       - name: Configure rclone for R2
-        shell: bash
         run: |
           printf '%s\n' \
             "[r2]" \
@@ -51,7 +52,6 @@ jobs:
           TMP="$(mktemp)"
           printf '{ "generated_at": "%s", "items": [' "$(date -u +%FT%TZ)" > "$TMP"
           FIRST=1
-
           while IFS= read -r -d '' f; do
             key="${f#public/}"
             size=$(stat -c%s "$f")
@@ -59,17 +59,13 @@ jobs:
             updated=$(date -u -r "$f" +%FT%TZ)
             base=$(basename "$f")
             title="${base%.*}"
-            # dashes -> spaces, Capitalize Words (Python one-liner to avoid heredoc/indent issues)
             title="$(printf '%s' "$title" | tr '-' ' ' | python3 -c 'import sys;t=sys.stdin.read().strip();print(" ".join(w[:1].upper()+w[1:] for w in t.split()))')"
-
             category="$(dirname "$key" | cut -d/ -f1)"
             [ "$category" = "." ] && category="root"
-
             if [ $FIRST -eq 1 ]; then FIRST=0; else echo ',' >> "$TMP"; fi
             printf '  { "path": "%s", "title": "%s", "category": "%s", "mime": "%s", "size": %s, "updated_at": "%s" }' \
                    "$key" "$title" "$category" "$mime" "$size" "$updated" >> "$TMP"
           done < <(find public -type f -print0 | sort -z)
-
           echo '] }' >> "$TMP"
           rclone --config=rclone.conf copyto "$TMP" "r2:${R2_BUCKET}/manifest.json"
 
