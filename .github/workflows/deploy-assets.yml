@@ -36,7 +36,7 @@ jobs:
           curl -fsSL https://rclone.org/install.sh | sudo -E bash
           rclone version
 
-            - name: Configure rclone for R2
+      - name: Configure rclone for R2
         run: |
           printf '%s\n' \
             "[r2]" \
