@@ -2,30 +2,30 @@ name: Deploy assets to R2 (public-only)
 
 on:
   push:
-    branches:
-      - main
-    paths:
-      - "public/**"
+    branches: [ "main" ]
+    paths: [ "public/**" ]
 
 jobs:
   upload:
     runs-on: ubuntu-latest
     env:
-      CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-      R2_BUCKET: ${{ vars.R2_BUCKET }}
-      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}   # <-- set this var
+      R2_BUCKET:             ${{ vars.R2_BUCKET }}               # <-- set this var
+      R2_ACCESS_KEY_ID:      ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY:  ${{ secrets.R2_SECRET_ACCESS_KEY }}
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Verify public directory
+      - name: Preflight (vars)
         run: |
-          set -euxo pipefail
-          test -d public
+          set -euo pipefail
+          : "${CLOUDFLARE_ACCOUNT_ID:?CLOUDFLARE_ACCOUNT_ID is empty. Set repo variable.}"
+          : "${R2_BUCKET:?R2_BUCKET is empty. Set repo variable.}"
+          echo "Endpoint OK: https://${CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com"
+          echo "Bucket OK:   ${R2_BUCKET}"
 
-      - name: Install rclone (official)
+      - name: Install rclone
         run: |
           curl -fsSL https://rclone.org/install.sh | sudo -E bash
           rclone version
