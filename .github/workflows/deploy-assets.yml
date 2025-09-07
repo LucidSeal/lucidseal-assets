@@ -7,68 +7,65 @@ on:
 
 jobs:
   upload:
-    environment: production   # must match your Environment name exactly
+    environment: production        # ensure an Environment named exactly this exists
     runs-on: ubuntu-latest
     env:
-      CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}   # <-- set this var
-      R2_BUCKET:             ${{ vars.R2_BUCKET }}               # <-- set this var
+      CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+      R2_BUCKET:             ${{ vars.R2_BUCKET }}
       R2_ACCESS_KEY_ID:      ${{ secrets.R2_ACCESS_KEY_ID }}
       R2_SECRET_ACCESS_KEY:  ${{ secrets.R2_SECRET_ACCESS_KEY }}
+    steps:
+      - uses: actions/checkout@v4
 
-steps:
-  - uses: actions/checkout@v4
+      - name: Ensure rclone installed
+        run: |
+          if ! command -v rclone >/dev/null 2>&1; then
+            curl -fsSL https://rclone.org/install.sh | sudo -E bash
+          fi
+          rclone version
 
-  # Ensure rclone is available
-  - name: Ensure rclone installed
-    run: |
-      if ! command -v rclone >/dev/null 2>&1; then
-        curl -fsSL https://rclone.org/install.sh | sudo -E bash
-      fi
-      rclone version
+      - name: Configure rclone for R2
+        run: |
+          printf '%s\n' \
+            "[r2]" \
+            "type = s3" \
+            "provider = Cloudflare" \
+            "access_key_id = ${R2_ACCESS_KEY_ID}" \
+            "secret_access_key = ${R2_SECRET_ACCESS_KEY}" \
+            "endpoint = https://${CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com" \
+            "region = auto" \
+            "force_path_style = true" \
+            "no_check_bucket = true" \
+            "acl = private" \
+            > rclone.conf
 
-  - name: Configure rclone for R2
-    run: |
-      printf '%s\n' \
-        "[r2]" \
-        "type = s3" \
-        "provider = Cloudflare" \
-        "access_key_id = ${R2_ACCESS_KEY_ID}" \
-        "secret_access_key = ${R2_SECRET_ACCESS_KEY}" \
-        "endpoint = https://${CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com" \
-        "region = auto" \
-        "force_path_style = true" \
-        "no_check_bucket = true" \
-        "acl = private" \
-        > rclone.conf
+      - name: Preflight bucket access
+        run: rclone --config=rclone.conf lsd "r2:${R2_BUCKET}" --s3-no-check-bucket
 
-  - name: Preflight bucket access
-    run: rclone --config=rclone.conf lsd "r2:${R2_BUCKET}" --s3-no-check-bucket
+      - name: Upload public/ to R2 bucket root
+        run: rclone --config=rclone.conf copy public "r2:${R2_BUCKET}" --checksum --s3-no-check-bucket
 
-  - name: Upload public/ to R2 bucket root
-    run: rclone --config=rclone.conf copy public "r2:${R2_BUCKET}" --checksum --s3-no-check-bucket
+      - name: Build manifest.json
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="manifest.json"
+          printf '{ "generated_at": "%s", "items": [' "$(date -u +%FT%TZ)" > "$OUT"
+          FIRST=1
+          while IFS= read -r -d '' f; do
+            key="${f#public/}"
+            size=$(stat -c%s "$f")
+            mime=$(file --brief --mime-type "$f")
+            updated=$(date -u -r "$f" +%FT%TZ)
+            base=$(basename "$f")
+            title="${base%.*}"
+            title="$(printf '%s' "$title" | tr '-' ' ' | python3 -c 'import sys;t=sys.stdin.read().strip();print(" ".join(w[:1].upper()+w[1:] for w in t.split()))')"
+            category="$(dirname "$key" | cut -d/ -f1)"; [ "$category" = "." ] && category="root"
+            if [ $FIRST -eq 1 ]; then FIRST=0; else echo ',' >> "$OUT"; fi
+            printf '  { "path": "%s", "title": "%s", "category": "%s", "mime": "%s", "size": %s, "updated_at": "%s" }' \
+                   "$key" "$title" "$category" "$mime" "$size" "$updated" >> "$OUT"
+          done < <(find public -type f -print0 | sort -z)
+          echo '] }' >> "$OUT"
 
-  - name: Build manifest.json
-    shell: bash
-    run: |
-      set -euo pipefail
-      OUT="manifest.json"
-      printf '{ "generated_at": "%s", "items": [' "$(date -u +%FT%TZ)" > "$OUT"
-      FIRST=1
-      while IFS= read -r -d '' f; do
-        key="${f#public/}"
-        size=$(stat -c%s "$f")
-        mime=$(file --brief --mime-type "$f")
-        updated=$(date -u -r "$f" +%FT%TZ)
-        base=$(basename "$f")
-        title="${base%.*}"
-        title="$(printf '%s' "$title" | tr '-' ' ' | python3 -c 'import sys;t=sys.stdin.read().strip();print(" ".join(w[:1].upper()+w[1:] for w in t.split()))')"
-        category="$(dirname "$key" | cut -d/ -f1)"; [ "$category" = "." ] && category="root"
-        if [ $FIRST -eq 1 ]; then FIRST=0; else echo ',' >> "$OUT"; fi
-        printf '  { "path": "%s", "title": "%s", "category": "%s", "mime": "%s", "size": %s, "updated_at": "%s" }' \
-               "$key" "$title" "$category" "$mime" "$size" "$updated" >> "$OUT"
-      done < <(find public -type f -print0 | sort -z)
-      echo '] }' >> "$OUT"
-
-  - name: Upload manifest.json
-    run: rclone --config=rclone.conf copyto manifest.json "r2:${R2_BUCKET}/manifest.json" --s3-no-check-bucket
-    
+      - name: Upload manifest.json
+        run: rclone --config=rclone.conf copyto manifest.json "r2:${R2_BUCKET}/manifest.json" --s3-no-check-bucket
