@@ -1,6 +1,8 @@
-# Access & Identity Policy (Lite)
-_Generated: 2025-09-06T19:48:47Z_
+**# Access & Identity Policy
 
-- MFA mandatory across GitHub, Cloudflare, Atlassian.
-- Least privilege; quarterly access review.
-- Immediate removal on departure; no shared admin credentials.
+- MFA is mandatory for all LucidSeal systems (GitHub, Atlassian, Cloudflare).
+- Access is role-based and granted on least privilege.
+- Quarterly review of accounts and permissions.
+- Immediate removal of access for departing contributors.
+- Admin credentials stored securely, not shared.
+**

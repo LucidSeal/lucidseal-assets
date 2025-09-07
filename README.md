@@ -23,7 +23,6 @@ community/         → Community First (escalation docs, surveys)
 cross-principle/   → Combined assets (Trust Page, maturity checklist)
 brand/             → Badge, logos, brand guide
 templates/           → Drafts or working copies (not published)
-grc/                 → Internal governance policies (not published)
 src/worker.js        → Cloudflare Worker serving assets
 .github/workflows/   → CI pipeline for publishing
 wrangler.toml        → Worker configuration

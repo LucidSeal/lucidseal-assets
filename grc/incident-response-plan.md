@@ -1,8 +1,23 @@
-# Incident Response Plan (Lite)
-_Generated: 2025-09-06T19:48:47Z_
+**# Incident Response Plan (Lite)
 
-1. Detect → Monitor Cloudflare/Atlassian/GitHub alerts.
-2. Contain → Revoke access, isolate impacted systems.
-3. Communicate → Internal note within 24h; notify OAIC if notifiable.
-4. Recover → Restore, validate, resume.
-5. Learn → Update risks and controls; publish summary if material.
+
+Step 1: Detect  
+Monitor alerts from Cloudflare, Atlassian, GitHub.  
+Report issues immediately to the LucidSeal admin.
+
+Step 2: Contain  
+Isolate affected accounts/services.  
+Suspend or revoke access if needed.
+
+Step 3: Communicate  
+Internal note in Confluence (within 24h).  
+If personal data involved, notify affected parties and OAIC (if notifiable).
+
+Step 4: Recover  
+Restore from GitHub/Cloudflare backups.  
+Test and verify before resuming service.
+
+Step 5: Learn  
+Update the Risk Register and controls.  
+Share a plain-language summary on the Trust Page if relevant.
+**
