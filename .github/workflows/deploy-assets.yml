@@ -3,6 +3,10 @@ name: Deploy assets to R2 (public-only)
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - 'public/**'
+
+
 
 jobs:
   upload:
