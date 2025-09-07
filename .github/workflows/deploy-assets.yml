@@ -1,0 +1,76 @@
+name: Deploy assets to R2 (public-only)
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'public/**'
+
+
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify public directory
+        run: |
+          test -d public || { echo "No public/ directory found"; exit 1; }
+
+      - name: Install rclone
+        uses: gacts/install-rclone@v1
+
+      - name: Configure rclone for R2
+        run: |
+          cat > rclone.conf <<EOF
+          [r2]
+          type = s3
+          provider = Cloudflare
+          access_key_id = ${R2_ACCESS_KEY_ID}
+          secret_access_key = ${R2_SECRET_ACCESS_KEY}
+          endpoint = https://${{ secrets.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com
+          acl = private
+          EOF
+        env:
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+
+      - name: Upload public/ to R2 bucket root
+        run: |
+          rclone --config=rclone.conf copy public r2:${{ secrets.R2_BUCKET }} --progress --checksum
+
+      - name: Generate manifest.json (public files only)
+        run: |
+          set -euo pipefail
+          TMP="$(mktemp)"
+          echo '{ "generated_at": "'"$(date -u +%FT%TZ)"'", "items": [' > "$TMP"
+          FIRST=1
+          while IFS= read -r f; do
+            key="${f#public/}"
+            size=$(stat -c%s "$f")
+            mime=$(file --brief --mime-type "$f")
+            updated=$(date -u -r "$f" +%FT%TZ)
+            base=$(basename "$f")
+            title="${base%.*}"
+            title=$(echo "$title" | tr '-' ' ' | sed -E 's/\b([a-z])/(\u\1)/g')
+            # fix title casing without GNU sed uppercase grouping in some envs
+            title=$(python3 - << 'PY'
+import sys
+t=sys.stdin.read().strip()
+print(" ".join([w[:1].upper()+w[1:] for w in t.split()]))
+PY
+)
+            category=$(dirname "$key" | cut -d/ -f1)
+            if [ $FIRST -eq 1 ]; then FIRST=0; else echo ',' >> "$TMP"; fi
+            printf '  { "path": "%s", "title": "%s", "category": "%s", "mime": "%s", "size": %s, "updated_at": "%s" }'               "$key" "$title" "$category" "$mime" "$size" "$updated" >> "$TMP"
+          done < <(find public -type f | sort)
+          echo '] }' >> "$TMP"
+          rclone --config=rclone.conf copyto "$TMP" r2:${{ secrets.R2_BUCKET }}/manifest.json
+        shell: bash
+
+      - name: Summary
+        run: |
+          echo "Published to: https://assets.lucidseal.org/"
+          echo "Manifest:     https://assets.lucidseal.org/manifest.json"
