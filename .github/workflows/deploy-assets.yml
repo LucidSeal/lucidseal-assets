@@ -9,7 +9,6 @@ on:
 jobs:
   upload:
     runs-on: ubuntu-latest
-    # Make these once per repo/env:
     env:
       CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
       R2_BUCKET: ${{ vars.R2_BUCKET }}
@@ -27,16 +26,17 @@ jobs:
         uses: gacts/install-rclone@v1
 
       - name: Configure rclone for R2
+        shell: bash
         run: |
-          cat > rclone.conf <<EOF
-          [r2]
-          type = s3
-          provider = Cloudflare
-          access_key_id = ${R2_ACCESS_KEY_ID}
-          secret_access_key = ${R2_SECRET_ACCESS_KEY}
-          endpoint = https://${CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com
-          acl = private
-EOF
+          printf '%s\n' \
+            "[r2]" \
+            "type = s3" \
+            "provider = Cloudflare" \
+            "access_key_id = ${R2_ACCESS_KEY_ID}" \
+            "secret_access_key = ${R2_SECRET_ACCESS_KEY}" \
+            "endpoint = https://${CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com" \
+            "acl = private" \
+            > rclone.conf
 
       - name: Upload public/ to R2 bucket root
         run: rclone --config=rclone.conf copy public r2:${R2_BUCKET} --progress --checksum
@@ -49,7 +49,6 @@ EOF
           printf '{ "generated_at": "%s", "items": [' "$(date -u +%FT%TZ)" > "$TMP"
           FIRST=1
 
-          # robust against spaces/newlines in filenames
           while IFS= read -r -d '' f; do
             key="${f#public/}"
             size=$(stat -c%s "$f")
@@ -57,15 +56,12 @@ EOF
             updated=$(date -u -r "$f" +%FT%TZ)
             base=$(basename "$f")
             title="${base%.*}"
-
-            # normalize title: dashes -> spaces, capitalise words (via Python)
             title="$(printf '%s' "$title" | tr '-' ' ' | python3 - <<'PY'
 import sys
 t=sys.stdin.read().strip()
 print(" ".join(w[:1].upper()+w[1:] for w in t.split()))
 PY
 )"
-
             category="$(dirname "$key" | cut -d/ -f1)"
             [ "$category" = "." ] && category="root"
 
