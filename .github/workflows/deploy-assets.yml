@@ -26,12 +26,17 @@ jobs:
           echo "Endpoint OK: https://${CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com"
           echo "Bucket OK:   ${R2_BUCKET}"
 
+      - name: Preflight bucket access
+        run: |
+          # Will 404 if bucket doesn't exist, or 403 if token lacks access
+          rclone --config=rclone.conf lsd r2:${R2_BUCKET} --s3-no-check-bucket >/dev/null
+      
       - name: Install rclone
         run: |
           curl -fsSL https://rclone.org/install.sh | sudo -E bash
           rclone version
 
-      - name: Configure rclone for R2
+            - name: Configure rclone for R2
         run: |
           printf '%s\n' \
             "[r2]" \
@@ -40,11 +45,14 @@ jobs:
             "access_key_id = ${R2_ACCESS_KEY_ID}" \
             "secret_access_key = ${R2_SECRET_ACCESS_KEY}" \
             "endpoint = https://${CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com" \
+            "region = auto" \
+            "force_path_style = true" \
+            "no_check_bucket = true" \
             "acl = private" \
             > rclone.conf
 
       - name: Upload public/ to R2 bucket root
-        run: rclone --config=rclone.conf copy public r2:${R2_BUCKET} --progress --checksum
+        run: rclone --config=rclone.conf copy public r2:${R2_BUCKET} --progress --checksum --s3-no-check-bucket
 
       - name: Generate manifest.json (public files only)
         shell: bash
@@ -61,14 +69,13 @@ jobs:
             base=$(basename "$f")
             title="${base%.*}"
             title="$(printf '%s' "$title" | tr '-' ' ' | python3 -c 'import sys;t=sys.stdin.read().strip();print(" ".join(w[:1].upper()+w[1:] for w in t.split()))')"
-            category="$(dirname "$key" | cut -d/ -f1)"
-            [ "$category" = "." ] && category="root"
+            category="$(dirname "$key" | cut -d/ -f1)"; [ "$category" = "." ] && category="root"
             if [ $FIRST -eq 1 ]; then FIRST=0; else echo ',' >> "$TMP"; fi
             printf '  { "path": "%s", "title": "%s", "category": "%s", "mime": "%s", "size": %s, "updated_at": "%s" }' \
                    "$key" "$title" "$category" "$mime" "$size" "$updated" >> "$TMP"
           done < <(find public -type f -print0 | sort -z)
           echo '] }' >> "$TMP"
-          rclone --config=rclone.conf copyto "$TMP" "r2:${R2_BUCKET}/manifest.json"
+          rclone --config=rclone.conf copyto "$TMP" "r2:${R2_BUCKET}/manifest.json" --s3-no-check-bucket
 
       - name: Summary
         run: |
