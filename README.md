@@ -63,14 +63,6 @@ Each entry includes:
 
 ---
 
-## 🔐 Internal GRC
-
-- Located under `/grc/`  
-- Includes: Privacy Policy, Terms of Use, IR Plan, Access & Identity Policy, BC/DR Lite  
-- **Never published** (excluded from CI/CD)  
-
----
-
 ## 🛡️ Security & Headers
 
 The Cloudflare Worker ensures:
