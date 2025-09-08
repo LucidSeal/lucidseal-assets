@@ -3,74 +3,158 @@ name: Deploy assets to R2 (public-only)
 on:
   push:
     branches: [ "main" ]
-    paths:
-      - 'public/**'
+    paths: [ "public/**" ]
 
-
+permissions:
+  contents: read
+  actions: read
 
 jobs:
-  upload:
+  scan-and-hash:
+    name: Malware scan & checksums (public/)
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Verify public directory
+      # ---- Malware Scan (ClamAV) ----
+      - name: Update & scan with ClamAV
+        uses: crazy-max/ghaction-clamav@v1
+        with:
+          scan_archives: true
+          database: fresh
+          path: |
+            public
+
+      # ---- Optional size budget (keep PDFs snappy) ----
+      - name: Enforce file size budget (optional)
         run: |
-          test -d public || { echo "No public/ directory found"; exit 1; }
+          MAX_MB=6
+          BIG=$(find public -type f -size +"${MAX_MB}"M -print || true)
+          if [ -n "$BIG" ]; then
+            echo "These files exceed ${MAX_MB}MB:"
+            echo "$BIG"
+            exit 1
+          fi
 
-      - name: Install rclone
-        uses: gacts/install-rclone@v1
+      # ---- Checksums (text + JSON) ----
+      - name: Generate SHA256 checksums (text)
+        run: |
+          mkdir -p build
+          find public -type f \( -name "*.pdf" -o -name "*.docx" -o -name "*.xlsx" -o -name "*.pptx" -o -name "*.csv" -o -name "*.zip" \) \
+            -print0 | xargs -0 sha256sum > build/checksums.txt
+
+      - name: Generate checksums.json
+        shell: bash
+        run: |
+          python3 - << 'PY'
+          import json, pathlib, hashlib
+          base = pathlib.Path("public")
+          items = {}
+          exts = {".pdf",".docx",".xlsx",".pptx",".csv",".zip"}
+          for p in base.rglob("*"):
+            if p.is_file() and p.suffix.lower() in exts:
+              h = hashlib.sha256()
+              with open(p, "rb") as f:
+                for chunk in iter(lambda: f.read(1024*1024), b""):
+                  h.update(chunk)
+              rel = str(p.relative_to(base).as_posix())
+              items[rel] = {"sha256": h.hexdigest()}
+          pathlib.Path("build/checksums.json").write_text(json.dumps(items, indent=2))
+          PY
+
+      - name: Upload artifact (checksums)
+        uses: actions/upload-artifact@v4
+        with:
+          name: asset-checksums
+          path: build/*
+
+  upload:
+    needs: scan-and-hash
+    environment: production
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+      R2_BUCKET:             ${{ vars.R2_BUCKET }}
+      R2_ACCESS_KEY_ID:      ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY:  ${{ secrets.R2_SECRET_ACCESS_KEY }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download checksum artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: asset-checksums
+          path: build
+
+      # ---- Integrity gate: recompute & compare before upload ----
+      - name: Recompute and compare checksums
+        run: |
+          set -euo pipefail
+          tmp=$(mktemp)
+          find public -type f \( -name "*.pdf" -o -name "*.docx" -o -name "*.xlsx" -o -name "*.pptx" -o -name "*.csv" -o -name "*.zip" \) \
+            -print0 | xargs -0 sha256sum > "$tmp"
+          diff -u <(sort "$tmp") <(sort build/checksums.txt)
+
+      - name: Ensure rclone installed
+        run: |
+          if ! command -v rclone >/dev/null 2>&1; then
+            curl -fsSL https://rclone.org/install.sh | sudo -E bash
+          fi
+          rclone version
 
       - name: Configure rclone for R2
         run: |
-          cat > rclone.conf <<EOF
-          [r2]
-          type = s3
-          provider = Cloudflare
-          access_key_id = ${R2_ACCESS_KEY_ID}
-          secret_access_key = ${R2_SECRET_ACCESS_KEY}
-          endpoint = https://${{ secrets.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com
-          acl = private
-          EOF
-        env:
-          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          printf '%s\n' \
+            "[r2]" \
+            "type = s3" \
+            "provider = Cloudflare" \
+            "access_key_id = ${R2_ACCESS_KEY_ID}" \
+            "secret_access_key = ${R2_SECRET_ACCESS_KEY}" \
+            "endpoint = https://${CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com" \
+            "region = auto" \
+            "force_path_style = true" \
+            "no_check_bucket = true" \
+            "acl = private" \
+            > rclone.conf
+
+      - name: Preflight bucket access
+        run: rclone --config=rclone.conf lsd "r2:${R2_BUCKET}" --s3-no-check-bucket
 
       - name: Upload public/ to R2 bucket root
         run: |
-          rclone --config=rclone.conf copy public r2:${{ secrets.R2_BUCKET }} --progress --checksum
+          rclone --config=rclone.conf copy public "r2:${R2_BUCKET}" \
+            --checksum --s3-no-check-bucket --transfers 16 --checkers 16 --fast-list
 
-      - name: Generate manifest.json (public files only)
+      - name: Build manifest.json
+        shell: bash
         run: |
           set -euo pipefail
-          TMP="$(mktemp)"
-          echo '{ "generated_at": "'"$(date -u +%FT%TZ)"'", "items": [' > "$TMP"
+          OUT="manifest.json"
+          printf '{ "generated_at": "%s", "items": [' "$(date -u +%FT%TZ)" > "$OUT"
           FIRST=1
-          while IFS= read -r f; do
+          while IFS= read -r -d '' f; do
             key="${f#public/}"
             size=$(stat -c%s "$f")
             mime=$(file --brief --mime-type "$f")
             updated=$(date -u -r "$f" +%FT%TZ)
-            base=$(basename "$f")
-            title="${base%.*}"
-            title=$(echo "$title" | tr '-' ' ' | sed -E 's/\b([a-z])/(\u\1)/g')
-            # fix title casing without GNU sed uppercase grouping in some envs
-            title=$(python3 - << 'PY'
-import sys
-t=sys.stdin.read().strip()
-print(" ".join([w[:1].upper()+w[1:] for w in t.split()]))
-PY
-)
-            category=$(dirname "$key" | cut -d/ -f1)
-            if [ $FIRST -eq 1 ]; then FIRST=0; else echo ',' >> "$TMP"; fi
-            printf '  { "path": "%s", "title": "%s", "category": "%s", "mime": "%s", "size": %s, "updated_at": "%s" }'               "$key" "$title" "$category" "$mime" "$size" "$updated" >> "$TMP"
-          done < <(find public -type f | sort)
-          echo '] }' >> "$TMP"
-          rclone --config=rclone.conf copyto "$TMP" r2:${{ secrets.R2_BUCKET }}/manifest.json
-        shell: bash
+            base=$(basename "$f"); title="${base%.*}"
+            title="$(printf '%s' "$title" | tr '-' ' ' | awk '{for(i=1;i<=NF;i++){ $i=toupper(substr($i,1,1)) substr($i,2)}; print}')"
+            category="$(dirname "$key" | cut -d/ -f1)"; [ "$category" = "." ] && category="root"
+            if [ $FIRST -eq 1 ]; then FIRST=0; else echo ',' >> "$OUT"; fi
+            printf '  { "path": "%s", "title": "%s", "category": "%s", "mime": "%s", "size": %s, "updated_at": "%s" }' \
+                   "$key" "$title" "$category" "$mime" "$size" "$updated" >> "$OUT"
+          done < <(find public -type f -print0 | sort -z)
+          echo '] }' >> "$OUT"
+
+      - name: Upload manifest + checksums
+        run: |
+          rclone --config=rclone.conf copyto manifest.json "r2:${R2_BUCKET}/manifest.json" --s3-no-check-bucket
+          rclone --config=rclone.conf copy build/checksums.* "r2:${R2_BUCKET}" --s3-no-check-bucket
 
       - name: Summary
         run: |
-          echo "Published to: https://assets.lucidseal.org/"
-          echo "Manifest:     https://assets.lucidseal.org/manifest.json"
+          echo "Published to R2 bucket: ${R2_BUCKET}"
+          echo "Manifest: r2:${R2_BUCKET}/manifest.json"
+          echo "Checksums: r2:${R2_BUCKET}/checksums.json and checksums.txt"
