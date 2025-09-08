@@ -18,13 +18,12 @@ jobs:
       - uses: actions/checkout@v4
 
       # ---- Malware Scan (ClamAV) ----
-      - name: Update & scan with ClamAV
-        uses: crazy-max/ghaction-clamav@v1
+      - name: Scan with ClamAV
+        uses: hugoalh/scan-virus-ghaction/clamav@v1
         with:
-          scan_archives: true
-          database: fresh
-          path: |
-            public
+          clamav_enable: true
+          clamav_update: true
+          path: public
 
       # ---- Optional size budget (keep PDFs snappy) ----
       - name: Enforce file size budget (optional)
