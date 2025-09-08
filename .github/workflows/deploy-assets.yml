@@ -18,12 +18,12 @@ jobs:
       - uses: actions/checkout@v4
 
       # ---- Malware Scan (ClamAV) ----
-      - name: Scan with ClamAV
-        uses: hugoalh/scan-virus-ghaction/clamav@v1
-        with:
-          clamav_enable: true
-          clamav_update: true
-          path: public
+      - name: Install & run ClamAV (DIY)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clamav
+          sudo freshclam
+          clamscan -r --infected --recursive public
 
       # ---- Optional size budget (keep PDFs snappy) ----
       - name: Enforce file size budget (optional)
