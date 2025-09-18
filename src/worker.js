@@ -23,7 +23,7 @@ const TYPES = {
 // Lock this down to your sites; or swap to "*" if you want fully public CORS
 const ALLOWED_ORIGINS = new Set([
   "https://lucidseal.org",
-  "https://www.lucidseal.org",
+  "https://staging.lucidseal.org",
   "https://assets.lucidseal.org"
 ]);
 
