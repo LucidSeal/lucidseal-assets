@@ -1,100 +1,133 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<title>LucidSeal – Brand Guide</title>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex,nofollow">
-<link rel="icon" type="image/png" href="https://assets.lucidseal.org/brand/app/icon-192.png" sizes="192x192" />
-<link rel="shortcut icon" href="https://assets.lucidseal.org/brand/app/favicon.ico" />
-<style>
-  :root {
-    --primary: #172738;
-    --text: #0b0d10;
-    --muted: #667085;
-  }
-  * { box-sizing: border-box; }
-  body { font-family: Inter, Segoe UI, system-ui, -apple-system, Arial, sans-serif; color: var(--text); margin: 0; }
-  .wrap { max-width: 900px; margin: 0 auto; padding: 32px; }
-  h1,h2,h3 { line-height: 1.25; margin: 0 0 12px; }
-  p { line-height: 1.6; margin: 8px 0 16px; }
-  .tag { color: white; background: var(--primary); padding: 4px 10px; border-radius: 999px; font-size: 12px; }
-  .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; }
-  .card { grid-column: span 12; border: 1px solid #e6e8eb; border-radius: 12px; padding: 16px; }
-  @media (min-width: 800px) { .card.half { grid-column: span 6; } }
-  .swatch { border-radius: 10px; height: 64px; border: 1px solid #e6e8eb; }
-  .row { display:flex; gap:12px; align-items: center; }
-  code, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 14px; }
-  .footer { font-size: 12px; color: var(--muted); margin-top: 24px; }
-</style>
+  <meta charset="utf-8" />
+  <title>LucidSeal — Brand Guide (MVP)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Use your live app.css path -->
+  <link rel="stylesheet" href="https://staging.lucidseal.org/assets/css/app.css" />
+  <meta name="robots" content="noindex,nofollow" />
+  <link rel="icon" type="image/svg+xml" href="https://assets.lucidseal.org/brand/app/favicon.svg" />
 </head>
 <body>
-  <div class="wrap">
-    <img src="https://assets.lucidseal.org/brand/logo/logo.png" alt="LucidSeal Logo" style="height:64px">
-    <h2>Where Digital Trust Begins</h2>
-    <div class="row" style="justify-content: space-between; align-items: center;">
-      <h1>Brand Guide</h1>
-      <span class="tag">v1.0</span>
-    </div>
-    <div class="grid">
-      <div class="card half">
-        <h2>Logo</h2>
-        <p>Primary logotype and shield mark. Use SVG where possible. Maintain clear space equal to the height of the “L”.</p>
-        <div class="row">
-          <img src="https://assets.lucidseal.org/brand/logo/logo.png" alt="LucidSeal Logo" style="height:64px">
-        </div>
-        <p><strong>Do:</strong> keep adequate contrast, leave clear space. <strong>Don’t:</strong> stretch, add effects, or recolor outside the palette.</p>
-      </div>
+  <a class="skip" href="#content">Skip to content</a>
 
-      <div class="card half">
-        <h2>Colors</h2>
-        <div class="row">
-          <div style="width:100%">
-            <div class="row">
-              <div class="swatch" style="background:#172738; width:100%"></div>
-            </div>
-            <p class="mono">Primary: #172738</p>
-            <p class="mono">Shades: 700 #101b27 · 600 #13212f · 400 #394755 · 200 #68727d</p>
+  <header class="appbar">
+    <div class="wrap bar">
+      <div class="brand">
+        <img class="logo" src="https://assets.lucidseal.org/brand/logo/logo.png" alt="LucidSeal logo">
+      </div>
+      <button class="burger" aria-label="Menu" hidden></button>
+    </div>
+  </header>
+
+  <main id="content" class="wrap">
+    <!-- Hero -->
+    <section class="card hero">
+      <h1 class="section-title">LucidSeal — Brand Guide</h1>
+        </section>
+
+    <!-- Grid sections -->
+    <section class="grid cols-2" style="margin-top:14px">
+      <!-- Logo -->
+      <article class="card">
+        <h2>Logo</h2>
+        <p class="meta">Use the primary logotype and shield mark. Prefer SVG. Keep clear space and strong contrast.</p>
+        <div class="two-col-grid" style="align-items:center">
+          <img src="https://assets.lucidseal.org/brand/logo/logo.png" alt="LucidSeal logo (primary)" style="max-height:72px">
+          <div>
+            <p class="blurb"><strong>Do</strong>: keep aspect ratio; ensure contrast; give breathing room.</p>
+            <p class="meta"><strong>Don’t</strong>: stretch, recolor, add effects, or place over busy imagery.</p>
           </div>
         </div>
-        <p>Status: <span class="mono">Success #1F7A5D</span> · <span class="mono">Warning #B88700</span> · <span class="mono">Error #B00020</span></p>
-      </div>
+      </article>
 
-      <div class="card half">
-        <h2>Typography</h2>
-        <p>Use the following stack:</p>
-        <p class="mono">Poppins, Inter, Segoe UI, system-ui, -apple-system, Arial, sans-serif</p>
-        <p>Weights: 400/500/600/700. Base size: 16px, line-height 1.5.</p>
-      </div>
+            <!-- Typography -->
+            <article class="card">
+              <h2>Typography</h2>
+              <p>Base: <code>16px/1.6</code> from <code>app.css</code>. Scale tokens: <code>--fs-h1</code>, <code>--fs-h2</code>, <code>--fs-h3</code>.</p>
+              <ul class="steps">
+                <li>Use short, plain sentences. Avoid jargon.</li>
+                <li>Links are underlined by default (distinct from brand colour).</li>
+                <li>Rely on the system-UI stack set in <code>app.css</code>.</li>
+              </ul>
+            </article>
 
-      <div class="card half">
-        <h2>Icons & PWA</h2>
-        <p>Favicons and app icons are included. For Safari pinned tabs, the SVG must be monochrome; color is set in HTML via <span class="mono">color="#111111"</span>.</p>
-        <p class="mono">&lt;link rel="mask-icon" href="https://assets.lucidseal.org/brand/assets/app/safari-pinned-tab.svg" color="#111111"&gt;</p>
-      </div>
-
-      <div class="card">
-        <h2>Badge Usage</h2>
-        <p>Sizes: Inline 14px (for text), UI 24–32px (buttons, headers), Marketing 128–256px. State colors must pass AA at small sizes.</p>
-        <div class="row">
-          <img src="https://assets.lucidseal.org/brand/badge/inline/badge_14h.png" style="height:14px" alt="Badge 14px">
-          <img src="https://assets.lucidseal.org/brand/badge/ui/badge_24h.png" style="height:24px" alt="Badge 24px">
-          <img src="https://assets.lucidseal.org/brand/badge/ui/badge_32h.png" style="height:32px" alt="Badge 32px">
-          <img src="https://assets.lucidseal.org/brand/badge/marketing/badge_128h.png" style="height:64px" alt="Badge 128px">
+      <!-- Colour -->
+      <article class="card">
+        <h2>Colour</h2>
+        <p class="meta">Use your app tokens directly (no overrides).</p>
+        <div class="two-col-grid">
+          <div class="tile">
+            <p class="blurb"><strong>Primary (accent)</strong></p>
+            <div style="height:56px;border-radius:12px;background: var(--accent); box-shadow: var(--shadow);"></div>
+            <p class="meta">Token: <code>--accent</code> · Secondary: <code>--accent-2</code></p>
+          </div>
+          <div class="tile">
+            <p class="blurb"><strong>Surfaces</strong></p>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem">
+              <div style="height:56px;border-radius:12px;background: var(--panel)"></div>
+              <div style="height:56px;border-radius:12px;background: var(--panel-2)"></div>
+            </div>
+            <p class="meta">Tokens: <code>--panel</code>, <code>--panel-2</code> · Border: <code>--ring</code></p>
+          </div>
         </div>
-        <p>For color variants, use status tokens from <span class="mono">brand/tokens.json</span>.</p>
-      </div>
+        <p class="meta" style="margin-top:.5rem">Text: <code>--ink</code> · Muted: <code>--muted</code> · Success: <code>--success</code></p>
+      </article>
 
-      <div class="card">
-        <h2>HTML Snippets</h2>
-        <p class="mono">&lt;link rel="icon" href="https://assets.lucidseal.org/brand/assets/app/favicon.ico"&gt;<br>
-        &lt;link rel="apple-touch-icon" href="https://assets.lucidseal.org/brand/assets/app/apple-touch-icon.png"&gt;<br>
-        &lt;link rel="manifest" href="https://assets.lucidseal.org/brand/assets/app/manifest.webmanifest"&gt;<br>
-        &lt;link rel="mask-icon" href="https://assets.lucidseal.org/brand/assets/app/safari-pinned-tab.svg" color="#111111"&gt;</p>
-      </div>
-    </div>
 
-    <div class="footer">© LucidSeal. This guide provides the essentials for web and print.</div>
-  </div>
+
+     
+
+      <!-- Badge (MVP rules) -->
+      <article class="card">
+        <h2>LucidSeal Badge (Quick Use)</h2>
+        <p class="meta">A visible trust signal. Keep usage simple and consistent.</p>
+        <div class="two-col-grid" style="align-items:center">
+          <div>
+            <img src="https://assets.lucidseal.org/brand/badge/marketing/badge_128h.png" alt="Badge — dark (for light backgrounds)" style="height:48px">
+            <div style="height:12px"></div>
+            <div class="tile">
+              <ul class="steps" style="margin:0">
+                <li><strong>Variants</strong>: dark (light bg), light (dark bg)</li>
+                <li><strong>Min size</strong>: 20px digital / 7mm print</li>
+                <li><strong>Do</strong>: use provided files; keep proportions</li>
+                <li><strong>Don’t</strong>: recolor, distort, rotate, add effects</li>
+              </ul>
+            </div>
+          </div>
+          <div>
+            <p class="blurb"><strong>Embed (inline)</strong></p>
+            <code>&lt;img src="/assets/badge_128h.png" alt="LucidSeal badge" width="48" height="48"></code></pre>
+            <p class="meta">Pair with “LucidSeal” set in your site font if desired.</p>
+          </div>
+        </div>
+      </article>
+</section>
+
+    <!-- Footer -->
+    <footer>
+      <div class="foot-row">
+        <div class="foot-links">
+          <a href="/trust">Trust</a>
+          <a href="/privacy">Privacy</a>
+          <a href="/resources">Resources</a>
+        </div>
+        <div class="social" aria-label="Social">
+          <a class="icon-btn" href="https://github.com/lucidseal" target="_blank" rel="me noopener" aria-label="GitHub">
+            <i data-lucide="github" aria-hidden="true"></i>
+          </a>
+          <a class="icon-btn" href="https://x.com/" target="_blank" rel="me noopener" aria-label="X">
+            <i data-lucide="twitter" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
+      <p class="meta">© LucidSeal. Use the badge to indicate commitment to the LucidSeal principles. Do not imply certification unless explicitly granted.</p>
+    </footer>
+  </main>
+
+  <!-- Lucide icons -->
+  <script defer src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script>document.addEventListener('DOMContentLoaded',()=>{ if(window.lucide) lucide.createIcons(); });</script>
 </body>
 </html>
