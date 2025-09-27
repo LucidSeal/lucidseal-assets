@@ -82,30 +82,16 @@ The Cloudflare Worker ensures:
 - **Cloudflare Worker**: `src/worker.js`, deploy with `wrangler deploy`  
 - **Route**: `assets.lucidseal.org/*` → Worker  
 - **GitHub Secrets**:
-  - `CLOUDFLARE_ACCOUNT_ID`
   - `R2_ACCESS_KEY_ID`
   - `R2_SECRET_ACCESS_KEY`
-  - `R2_BUCKET` = `lucidseal-assets`
-
----
-
-## ✅ Example Assets
-
-- Privacy Notice:  
-  [privacy/privacy-notice-template.pdf](https://assets.lucidseal.org/privacy/privacy-notice-template.pdf)
-- Risk Register Starter:  
-  [security/risk-register-starter.xlsx](https://assets.lucidseal.org/security/risk-register-starter.xlsx)
-- Trust Page (One-Pager):  
-  [cross-principle/trust-page-template.pdf](https://assets.lucidseal.org/cross-principle/trust-page-template.pdf)
+  - `R2_ENDPOINT`
 
 ---
 
 ## 🔮 Future Enhancements
 
-- Versioned URLs (`/v1/...`) and immutable hash paths (`/sha256/...`)  
-- Auto-generate DOCX/PDF from Markdown templates (Pandoc in CI)  
-- Optional public UI for browsing assets  
-- Signed URLs for restricted or draft assets  
+- Public UI for browsing assets  
+- TBC  
 
 ---
 
