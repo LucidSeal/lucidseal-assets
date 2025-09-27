@@ -4,10 +4,12 @@
 ![Last Updated](https://img.shields.io/github/last-commit/lucidseal/lucidseal-assets/main?label=Last%20Updated)
 [![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
 
-This repository is the **source of truth** for LucidSeal’s public assets and internal governance (GRC) documents.
+This repository is the **source of truth** for LucidSeal’s public assets.  
+Assets are automatically published to [https://assets.lucidseal.org](https://assets.lucidseal.org) for community use.
 
-- **Public assets** → Published automatically to [https://assets.lucidseal.org](https://assets.lucidseal.org)  
-- **Internal GRC docs** → Versioned in GitHub for governance, but **not published**  
+⚠️ Note: Removing a file from this repo does **not** remove it from R2 storage. Clean-up must be done manually by maintainers.
+
+This repo is intended for both community users (as a source of public assets) and maintainers (who publish them).
 
 ---
 
@@ -22,7 +24,7 @@ security/          → Secure Foundations (checklists, registers)
 community/         → Community First (escalation docs, surveys)
 cross-principle/   → Combined assets (Trust Page, maturity checklist)
 brand/             → Badge, logos, brand guide
-templates/           → Drafts or working copies (not published)
+templates/           → Drafts or working copies
 src/worker.js        → Cloudflare Worker serving assets
 .github/workflows/   → CI pipeline for publishing
 wrangler.toml        → Worker configuration
@@ -118,4 +120,4 @@ for any purpose, even commercially.
 
 You must:  
 ✏️ Give appropriate credit and indicate if changes were made.
-```
+
