@@ -3,6 +3,7 @@
 [![Build Status](https://github.com/lucidseal/lucidseal-assets/actions/workflows/deploy-assets.yml/badge.svg)](https://github.com/lucidseal/lucidseal-assets/actions/workflows/deploy-assets.yml)
 ![Last Updated](https://img.shields.io/github/last-commit/lucidseal/lucidseal-assets/main?label=Last%20Updated)
 [![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
+[![Better Stack Badge](https://uptime.betterstack.com/status-badges/v2/monitor/25ipx.svg)](https://uptime.betterstack.com/?utm_source=status_badge)
 
 This repository is the **source of truth** for LucidSeal’s public assets.  
 Assets are automatically published to [https://assets.lucidseal.org](https://assets.lucidseal.org) for community use.
