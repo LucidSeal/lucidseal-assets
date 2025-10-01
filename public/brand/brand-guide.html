@@ -4,10 +4,18 @@
   <meta charset="utf-8" />
   <title>LucidSeal — Brand Guide (MVP)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- Use your live app.css path -->
   <link rel="stylesheet" href="https://staging.lucidseal.org/assets/css/app.css" />
   <meta name="robots" content="noindex,nofollow" />
   <link rel="icon" type="image/svg+xml" href="https://assets.lucidseal.org/brand/app/favicon.svg" />
+  <style>
+    /* Tiny helpers scoped to this page */
+    .grid { display:grid; gap:1rem; }
+    .cols-2 { grid-template-columns: 1fr 1fr; }
+    @media (max-width: 900px){ .cols-2 { grid-template-columns: 1fr; } }
+    .swatch { height:44px; border-radius:12px; border:1px solid var(--ring); }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:.92em }
+    .row { display:flex; align-items:center; gap:1rem; }
+  </style>
 </head>
 <body>
   <a class="skip" href="#content">Skip to content</a>
@@ -22,112 +30,130 @@
   </header>
 
   <main id="content" class="wrap">
-    <!-- Hero -->
     <section class="card hero">
-      <h1 class="section-title">LucidSeal — Brand Guide</h1>
-        </section>
+      <h1 class="section-title">Brand Guide</h1>
+      <p class="muted">This page reads values directly from <code>app.css</code>.</p>
+    </section>
 
-    <!-- Grid sections -->
-    <section class="grid cols-2" style="margin-top:14px">
-      <!-- Logo -->
+    <!-- Logo + Badge -->
+    <section class="grid cols-2">
       <article class="card">
         <h2>Logo</h2>
-        <p class="meta">Use the primary logotype and shield mark. Prefer SVG. Keep clear space and strong contrast.</p>
-        <div class="two-col-grid" style="align-items:center">
+        <div class="row" style="align-items:center">
           <img src="https://assets.lucidseal.org/brand/logo/logo.png" alt="LucidSeal logo (primary)" style="max-height:72px">
-          <div>
-            <p class="blurb"><strong>Do</strong>: keep aspect ratio; ensure contrast; give breathing room.</p>
-            <p class="meta"><strong>Don’t</strong>: stretch, recolor, add effects, or place over busy imagery.</p>
-          </div>
+          <p class="meta">Prefer SVG. Keep contrast. Don’t stretch/recolour/add effects.</p>
         </div>
+        <p class="mono">
+          <a href="https://assets.lucidseal.org/brand/logo/logo.svg">SVG</a> ·
+          <a href="https://assets.lucidseal.org/brand/logo/logo.png">PNG</a>
+        </p>
       </article>
 
-            <!-- Typography -->
-            <article class="card">
-              <h2>Typography</h2>
-              <p>Base: <code>16px/1.6</code> from <code>app.css</code>. Scale tokens: <code>--fs-h1</code>, <code>--fs-h2</code>, <code>--fs-h3</code>.</p>
-              <ul class="steps">
-                <li>Use short, plain sentences. Avoid jargon.</li>
-                <li>Links are underlined by default (distinct from brand colour).</li>
-                <li>Rely on the system-UI stack set in <code>app.css</code>.</li>
-              </ul>
-            </article>
-
-      <!-- Colour -->
       <article class="card">
-        <h2>Colour</h2>
-        <p class="meta">Use your app tokens directly (no overrides).</p>
-        <div class="two-col-grid">
-          <div class="tile">
-            <p class="blurb"><strong>Primary (accent)</strong></p>
-            <div style="height:56px;border-radius:12px;background: var(--accent); box-shadow: var(--shadow);"></div>
-            <p class="meta">Token: <code>--accent</code> · Secondary: <code>--accent-2</code></p>
-          </div>
-          <div class="tile">
-            <p class="blurb"><strong>Surfaces</strong></p>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem">
-              <div style="height:56px;border-radius:12px;background: var(--panel)"></div>
-              <div style="height:56px;border-radius:12px;background: var(--panel-2)"></div>
-            </div>
-            <p class="meta">Tokens: <code>--panel</code>, <code>--panel-2</code> · Border: <code>--ring</code></p>
-          </div>
+        <h2>Badge</h2>
+        <div class="row" style="align-items:center">
+          <img src="https://assets.lucidseal.org/brand/badge/marketing/badge_128h.png" alt="Badge (dark on light)" style="height:48px">
+          <ul class="steps" style="margin:0">
+            <li>Dark for light backgrounds; Light for dark backgrounds</li>
+            <li>Min size: 20px digital / 7mm print</li>
+            <li>Don’t recolour/distort/rotate/add effects</li>
+          </ul>
         </div>
-        <p class="meta" style="margin-top:.5rem">Text: <code>--ink</code> · Muted: <code>--muted</code> · Success: <code>--success</code></p>
+        <p class="mono">Embed: <code>&lt;img src="/assets/badge_128h.png" alt="LucidSeal badge" width="48" height="48"&gt;</code></p>
       </article>
+    </section>
 
+    <!-- Colour (live) -->
+    <section class="card">
+      <h2>Colour (Live Tokens)</h2>
+      <div class="grid cols-2" id="colour-grid"></div>
+      <p class="meta">Uses tokens: <code>--accent</code>, <code>--accent-2</code>, <code>--ink</code>, <code>--muted</code>, <code>--panel</code>, <code>--panel-2</code>, <code>--ring</code>, <code>--success</code>, <code>--danger</code>, <code>--warn</code> (shown only if defined).</p>
+    </section>
 
-
-     
-
-      <!-- Badge (MVP rules) -->
-      <article class="card">
-        <h2>LucidSeal Badge (Quick Use)</h2>
-        <p class="meta">A visible trust signal. Keep usage simple and consistent.</p>
-        <div class="two-col-grid" style="align-items:center">
-          <div>
-            <img src="https://assets.lucidseal.org/brand/badge/marketing/badge_128h.png" alt="Badge — dark (for light backgrounds)" style="height:48px">
-            <div style="height:12px"></div>
-            <div class="tile">
-              <ul class="steps" style="margin:0">
-                <li><strong>Variants</strong>: dark (light bg), light (dark bg)</li>
-                <li><strong>Min size</strong>: 20px digital / 7mm print</li>
-                <li><strong>Do</strong>: use provided files; keep proportions</li>
-                <li><strong>Don’t</strong>: recolor, distort, rotate, add effects</li>
-              </ul>
-            </div>
-          </div>
-          <div>
-            <p class="blurb"><strong>Embed (inline)</strong></p>
-            <code>&lt;img src="/assets/badge_128h.png" alt="LucidSeal badge" width="48" height="48"></code></pre>
-            <p class="meta">Pair with “LucidSeal” set in your site font if desired.</p>
-          </div>
+    <!-- Type (live) -->
+    <section class="card">
+      <h2>Typography (Live)</h2>
+      <div class="grid cols-2">
+        <div>
+          <h1 id="h1-demo">Heading 1</h1>
+          <p class="meta mono">Computed: <span id="h1-size"></span></p>
+          <h2 id="h2-demo">Heading 2</h2>
+          <p class="meta mono">Computed: <span id="h2-size"></span></p>
+          <h3 id="h3-demo">Heading 3</h3>
+          <p class="meta mono">Computed: <span id="h3-size"></span></p>
         </div>
-      </article>
-</section>
+        <div>
+          <p>Body text — short, plain sentences. Avoid jargon. Links are underlined by default.</p>
+          <p class="meta mono">Base: 16px/1.6 (via app.css system-UI stack)</p>
+        </div>
+      </div>
+    </section>
 
-    <!-- Footer -->
     <footer>
       <div class="foot-row">
         <div class="foot-links">
-          <a href="/trust">Trust</a>
-          <a href="/privacy">Privacy</a>
-          <a href="/resources">Resources</a>
         </div>
         <div class="social" aria-label="Social">
           <a class="icon-btn" href="https://github.com/lucidseal" target="_blank" rel="me noopener" aria-label="GitHub">
             <i data-lucide="github" aria-hidden="true"></i>
           </a>
-          <a class="icon-btn" href="https://x.com/" target="_blank" rel="me noopener" aria-label="X">
-            <i data-lucide="twitter" aria-hidden="true"></i>
-          </a>
         </div>
       </div>
-      <p class="meta">© LucidSeal. Use the badge to indicate commitment to the LucidSeal principles. Do not imply certification unless explicitly granted.</p>
+      <p class="meta">© LucidSeal.</p>
     </footer>
   </main>
 
   <!-- Lucide icons -->
   <script defer src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-  <script>document.addEventListener('DOMContentLoaded',()=>{ if(window.lucide) lucide.createIcons(); });</script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.lucide) lucide.createIcons();
+      const css = getComputedStyle(document.documentElement);
+      const get = (k) => css.getPropertyValue(k).trim();
+      const keys = ['--accent','--accent-2','--ink','--muted','--panel','--panel-2','--ring','--success','--danger','--warn'];
+      const grid = document.getElementById('colour-grid');
+
+      keys.forEach(k => {
+        const val = get(k);
+        if (!val) return;
+        const card = document.createElement('article');
+        card.className = 'card';
+        card.innerHTML = `
+          <p class="mono"><code>${k}</code> = <span>${val}</span></p>
+          <div class="swatch" style="background:${val}" aria-hidden="true"></div>
+        `;
+        grid.appendChild(card);
+      });
+
+      const size = el => window.getComputedStyle(el).fontSize;
+      h1_size.textContent = size(h1_demo);
+      h2_size.textContent = size(h2_demo);
+      h3_size.textContent = size(h3_demo);
+    });
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  const rootSize = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+  const cs = el => getComputedStyle(el);
+  const pxToRem = px => (parseFloat(px) / rootSize).toFixed(3) + 'rem';
+
+  function fillComputed(elId, outId){
+    const el = document.getElementById(elId);
+    const out = document.getElementById(outId);
+    if (!el || !out) return;
+    const s = cs(el);
+    const sizePx = s.fontSize;          // e.g. "28px"
+    const sizeRem = pxToRem(sizePx);    // e.g. "1.750rem"
+    const lh = s.lineHeight;            // often a px value; if "normal", browser-dependent
+    const weight = s.fontWeight;        // "400", "600", etc.
+    out.textContent = `${sizePx} (${sizeRem}) · line-height: ${lh} · weight: ${weight}`;
+  }
+
+  fillComputed('h1-demo','h1-size');
+  fillComputed('h2-demo','h2-size');
+  fillComputed('h3-demo','h3-size');
+});
+</script>
+
 </body>
 </html>
