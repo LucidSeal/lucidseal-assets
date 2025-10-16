@@ -1,0 +1,23 @@
+name: lucidseal-assets
+id: ari:cloud:compass:b3e27ea5-96e7-4a50-94cc-e490dabd544c:component/add451c9-badb-4187-869d-0043cc21b62f/33112893-9434-4eb9-b6f8-d0a9d12a7bc8
+description: Canonical LucidSeal docs (principles, guides, kits).
+configVersion: 1
+typeId: SERVICE
+ownerId: ari:cloud:identity::team/3138362a-883a-4df5-ae66-c21ee40b5d6a
+fields:
+  tier: 4
+links:
+  - name: null
+    type: REPOSITORY
+    url: https://github.com/LucidSeal/lucidseal-assets
+relationships:
+  DEPENDS_ON: []
+labels:
+  - assets
+  - documentation
+  - guide
+  - kit
+  - language:html
+  - principles
+  - source:github
+customFields: null
